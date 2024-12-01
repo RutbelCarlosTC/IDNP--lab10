@@ -1,16 +1,9 @@
 package com.example.audioplayer;
 
 import android.content.Intent;
-import android.media.MediaPlayer;
 import android.os.Bundle;
-
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
-import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
 
