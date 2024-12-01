@@ -17,6 +17,7 @@ public class AudioPlayerService extends Service {
     private MediaPlayer mediaPlayer;
     private static final String CHANNEL_ID = "AudioPlayerChannel";
     private PendingIntent pendingIntent;
+    private boolean isForeground = false;
 
     @Override
     public void onCreate() {
@@ -43,9 +44,30 @@ public class AudioPlayerService extends Service {
                 mediaPlayer.stop();
                 stopSelf();
             }
+        } else if ("START_FOREGROUND".equals(action)) {
+            startForegroundService();
+        } else if ("STOP_FOREGROUND".equals(action)) {
+            stopForegroundService();
         }
 
-        // Crea un PendingIntent para abrir MainActivity
+        return START_STICKY;
+    }
+    private void startForegroundService() {
+        if (!isForeground) {
+            Notification notification = createNotification();
+            startForeground(1, notification);
+            isForeground = true;
+        }
+    }
+
+    private void stopForegroundService() {
+        if (isForeground) {
+            stopForeground(true);
+            isForeground = false;
+        }
+    }
+
+    private Notification createNotification() {
         Intent notificationIntent = new Intent(this, MainActivity.class);
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(
@@ -55,32 +77,27 @@ public class AudioPlayerService extends Service {
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
 
-
-        // Muestra la notificación si es necesario
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(
-                CHANNEL_ID,
-                "Audio Player",
-                NotificationManager.IMPORTANCE_LOW
+                    CHANNEL_ID,
+                    "Audio Player",
+                    NotificationManager.IMPORTANCE_LOW
             );
             NotificationManager manager = getSystemService(NotificationManager.class);
             if (manager != null) {
                 manager.createNotificationChannel(channel);
             }
-            Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-                    .setContentTitle("Reproducción de Audio")
-                    .setContentText("Reproduciendo audio en segundo plano")
-                    .setSmallIcon(R.drawable.baseline_audiotrack_24)
-                    .setContentIntent(pendingIntent)
-                    .addAction(R.drawable.baseline_pause_24, "Pausar", getActionPendingIntent("PAUSE"))
-                    .addAction(R.drawable.baseline_play_arrow_24, "Reproducir", getActionPendingIntent("PLAY"))
-                    .addAction(R.drawable.baseline_stop_24, "Detener", getActionPendingIntent("STOP"))
-                    .build();
-
-            startForeground(1, notification);
         }
 
-        return START_STICKY;
+        return new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setContentTitle("Reproducción de Audio")
+                .setContentText("Reproduciendo audio en segundo plano")
+                .setSmallIcon(R.drawable.baseline_audiotrack_24)
+                .setContentIntent(pendingIntent)
+                .addAction(R.drawable.baseline_pause_24, "Pausar", getActionPendingIntent("PAUSE"))
+                .addAction(R.drawable.baseline_play_arrow_24, "Reproducir", getActionPendingIntent("PLAY"))
+                .addAction(R.drawable.baseline_stop_24, "Detener", getActionPendingIntent("STOP"))
+                .build();
     }
 
     @Override
