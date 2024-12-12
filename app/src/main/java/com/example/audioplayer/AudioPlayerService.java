@@ -39,7 +39,7 @@ public class AudioPlayerService extends Service {
         if ("PLAY".equals(action)) {
             if (!mediaPlayer.isPlaying()) {
                 mediaPlayer.start();
-                startForegroundService();
+                //startForegroundService();
                 startProgressUpdate();
             }
         } else if ("PAUSE".equals(action)) {
