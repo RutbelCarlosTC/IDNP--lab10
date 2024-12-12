@@ -68,6 +68,7 @@ public class AudioPlayerService extends Service {
 
     private void startForegroundService() {
         if (!isForeground) {
+            Log.d("AudioPlayerService", "Iniciando servicio en primer plano");
             Notification notification = createNotification();
             startForeground(1, notification);
             isForeground = true;
@@ -76,12 +77,14 @@ public class AudioPlayerService extends Service {
 
     private void stopForegroundService() {
         if (isForeground) {
+            Log.d("AudioPlayerService", "Deteniendo servicio en primer plano");
             stopForeground(true);
             isForeground = false;
         }
     }
 
     private Notification createNotification() {
+        Log.d("AudioPlayerService", "Creando notificación");
         Intent notificationIntent = new Intent(this, MainActivity.class);
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(
@@ -196,6 +199,7 @@ public class AudioPlayerService extends Service {
     private void updateNotification() {
         // Aquí se puede actualizar la notificación para mostrar el progreso de la canción.
         int progress = (mediaPlayer.isPlaying()) ? mediaPlayer.getCurrentPosition() * 100 / mediaPlayer.getDuration() : 0;
+
         Notification notification = createNotification();
         startForeground(1, notification); // Actualiza la notificación
     }
